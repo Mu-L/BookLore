@@ -9,6 +9,7 @@ import com.adityachandel.booklore.repository.AuthorRepository;
 import com.adityachandel.booklore.repository.BookMetadataRepository;
 import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.repository.CategoryRepository;
+import com.adityachandel.booklore.service.metadata.writer.EpubMetadataWriter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -75,6 +76,7 @@ public class BookMetadataRestorer {
             metadata.setCategories(categories);
         }
 
+        if (!isLocked(metadata.getPersonalRatingLocked())) metadata.setPersonalRating(backup.getPersonalRating());
         if (!isLocked(metadata.getAmazonRatingLocked())) metadata.setAmazonRating(backup.getAmazonRating());
         if (!isLocked(metadata.getAmazonReviewCountLocked())) metadata.setAmazonReviewCount(backup.getAmazonReviewCount());
 

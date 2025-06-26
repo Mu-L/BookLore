@@ -24,6 +24,7 @@ import com.adityachandel.booklore.service.fileprocessor.CbxProcessor;
 import com.adityachandel.booklore.service.fileprocessor.EpubProcessor;
 import com.adityachandel.booklore.service.fileprocessor.PdfProcessor;
 import com.adityachandel.booklore.service.metadata.parser.BookParser;
+import com.adityachandel.booklore.service.metadata.writer.EpubMetadataWriter;
 import com.adityachandel.booklore.util.FileService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -432,7 +433,10 @@ public class BookMetadataService {
         fileService.createThumbnailFromFile(bookId, file);
         BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
         bookEntity.getMetadata().setCoverUpdatedOn(Instant.now());
-        epubMetadataWriter.replaceCoverImageFromUpload(bookEntity, file);
+        boolean saveToOriginalFile = appSettingService.getAppSettings().getMetadataPersistenceSettings().isSaveToOriginalFile();
+        if (saveToOriginalFile) {
+            epubMetadataWriter.replaceCoverImageFromUpload(bookEntity, file);
+        }
         return bookMetadataMapper.toBookMetadata(bookEntity.getMetadata(), true);
     }
 

@@ -1,10 +1,12 @@
 package com.adityachandel.booklore.service.metadata;
 
 import com.adityachandel.booklore.exception.ApiError;
+import com.adityachandel.booklore.model.dto.BookMetadata;
 import com.adityachandel.booklore.model.dto.EpubMetadata;
 import com.adityachandel.booklore.model.entity.BookEntity;
 import com.adityachandel.booklore.model.entity.BookMetadataEntity;
 import com.adityachandel.booklore.repository.BookRepository;
+import com.adityachandel.booklore.service.metadata.extractor.EpubMetadataExtractor;
 import com.adityachandel.booklore.util.FileService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
@@ -34,7 +36,7 @@ public class MetadataBackupRestoreService {
     private final FileService fileService;
     private final ObjectMapper objectMapper;
     private final BookRepository bookRepository;
-    private final EpubMetadataReader epubMetadataReader;
+    private final EpubMetadataExtractor epubMetadataExtractor;
     private final BookMetadataRestorer bookMetadataRestorer;
 
     public void backupEmbeddedMetadataIfNotExists(BookEntity bookEntity, boolean backupCover) {
@@ -51,7 +53,7 @@ public class MetadataBackupRestoreService {
 
             Files.createDirectories(backupDir);
 
-            EpubMetadata metadata = epubMetadataReader.readMetadata(bookFile);
+            BookMetadata metadata = epubMetadataExtractor.extractMetadata(bookFile);
             String json = objectMapper.writer().writeValueAsString(metadata);
             Files.writeString(metadataFile, json, StandardOpenOption.CREATE_NEW);
 
